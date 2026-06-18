@@ -6,6 +6,8 @@
     <title>Origine - Hub Professionale v8</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -16,100 +18,568 @@
 <body class="bg-slate-50 text-slate-800 antialiased">
 
     <header class="bg-slate-900 text-white shadow-xl border-b border-amber-500/20 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto p-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold tracking-tight text-amber-400">ORIGINE</h1>
-                <p class="text-[9px] uppercase tracking-widest text-slate-400">Hub Gestionale</p>
+        <div class="max-w-7xl mx-auto p-4 sm:p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-amber-400 to-amber-200 bg-clip-text text-transparent">ORIGINE</h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mt-0.5">di Maria Teresa & Cosimo Carlucci</p>
             </div>
-            <select id="filtro-unita-generale" onchange="aggiornaTutto()" class="bg-slate-800 text-xs border border-slate-700 rounded-lg p-2 outline-none">
-                <option value="TUTTE">Tutte le Unità</option>
-                <option value="PT_A">PT - Interno A</option>
-                <option value="PT_B">PT - Interno B</option>
-            </select>
+            <div class="w-full md:w-80 relative">
+                <input type="text" id="ricerca-globale" oninput="filtraContenutoTab()" placeholder="🔍 Cerca per testo o #tag (es: #luglio)..." class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all">
+            </div>
         </div>
-        <div class="bg-slate-950/60 backdrop-blur-md">
-            <div class="max-w-7xl mx-auto flex overflow-x-auto px-2">
-                <button onclick="switchTab('panoramica')" class="tab-btn py-3 px-4 text-[11px] font-bold border-b-2 border-amber-500 text-amber-500">Finanze</button>
-                <button onclick="switchTab('prenotazioni')" class="tab-btn py-3 px-4 text-[11px] font-bold border-b-2 border-transparent text-slate-400 hover:text-white">Prenotazioni</button>
-                <button onclick="switchTab('analisi')" class="tab-btn py-3 px-4 text-[11px] font-bold border-b-2 border-transparent text-slate-400 hover:text-white">Analisi</button>
+        
+        <div class="bg-slate-950/60 border-t border-slate-800/50 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-4 flex space-x-1 overflow-x-auto">
+                <button onclick="switchTab('panoramica')" class="tab-btn py-3.5 px-5 text-xs font-semibold border-b-2 border-amber-500 text-amber-500 cursor-pointer">Finanze</button>
+                <button onclick="switchTab('analisi')" class="tab-btn py-3.5 px-5 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-white cursor-pointer">Analisi & Grafici</button>
+                <button onclick="switchTab('prenotazioni')" class="tab-btn py-3.5 px-5 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-white cursor-pointer">Prenotazioni</button>
+                <button onclick="switchTab('documenti')" class="tab-btn py-3.5 px-5 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-white cursor-pointer">Documenti</button>
+                <button onclick="switchTab('note')" class="tab-btn py-3.5 px-5 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-white cursor-pointer">Note Operative</button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 space-y-6">
-        <div id="panoramica" class="tab-content active space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-emerald-600 p-4 rounded-xl text-white shadow-lg"><h3 class="text-[9px] uppercase opacity-80">Entrate</h3><p id="txt-entrate" class="text-xl font-bold">€ 0.00</p></div>
-                <div class="bg-rose-600 p-4 rounded-xl text-white shadow-lg"><h3 class="text-[9px] uppercase opacity-80">Uscite</h3><p id="txt-uscite" class="text-xl font-bold">€ 0.00</p></div>
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200/60 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Unità Attiva:</span>
+            <select id="filtro-unita-generale" onchange="aggiornaTutto()" class="p-2.5 border border-slate-200 rounded-lg text-xs bg-slate-50 font-semibold text-slate-700 focus:ring-2 focus:ring-amber-500 outline-none min-w-[240px]">
+                <option value="TUTTE">Tutte le Unità (Flusso Globale)</option>
+                <option value="PT_A">Piano Terra - Interno A</option>
+                <option value="PT_B">Piano Terra - Interno B</option>
+                <option value="P1">Primo Piano (Struttura)</option>
+                <option value="COMUNE">Spazi Comuni (Giardino)</option>
+            </select>
+        </div>
+
+        <div id="panoramica" class="tab-content active space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60"><h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Flusso Netto Complessivo</h3><p id="txt-bilancio" class="text-2xl font-bold tracking-tight mt-1 text-slate-900">€ 0.00</p></div>
+                <div class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60 border-l-4 border-emerald-500"><h3 class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Entrate</h3><p id="txt-entrate" class="text-2xl font-bold tracking-tight text-emerald-600 mt-1">€ 0.00</p></div>
+                <div class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60 border-l-4 border-rose-500"><h3 class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Uscite</h3><p id="txt-uscite" class="text-2xl font-bold tracking-tight text-rose-600 mt-1">€ 0.00</p></div>
             </div>
-            <div class="bg-white p-4 rounded-xl border border-slate-200">
-                <table class="w-full text-xs">
-                    <tbody id="tabella-finanze"></tbody>
+
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60 space-y-4">
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">💶 Registra Nuova Voce di Spesa / Entrata</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+                    <select id="fin-unita" class="p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none"><option value="PT_A">PT - Interno A</option><option value="PT_B">PT - Interno B</option><option value="P1">Primo Piano</option><option value="COMUNE">Spazi Comuni</option></select>
+                    <input type="text" id="fin-desc" placeholder="Causale (es: Bolletta Luce #luglio)" class="p-2.5 border border-slate-200 rounded-lg text-xs outline-none md:col-span-2 focus:border-amber-500">
+                    <select id="fin-tipo" class="p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none"><option value="uscita">Uscita / Spesa (-)</option><option value="entrata">Entrata (+)</option></select>
+                    <input type="number" id="fin-importo" placeholder="Importo Totale €" class="p-2.5 border border-slate-200 rounded-lg text-xs outline-none focus:border-amber-500">
+                </div>
+                <button onclick="aggiungiTransazione()" class="bg-slate-900 text-white font-semibold py-2 px-5 rounded-lg text-xs hover:bg-amber-600 transition shadow-xs cursor-pointer">Registra e Apri Dettagli</button>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200/60 overflow-hidden">
+                <table class="w-full text-left text-xs text-slate-600 dynamic-table">
+                    <thead class="bg-slate-900 text-white text-[10px] uppercase tracking-wider">
+                        <tr>
+                            <th class="p-3.5 font-medium">Unità</th>
+                            <th class="p-3.5 font-medium">Causale & Tag</th>
+                            <th class="p-3.5 font-medium">Tipo</th>
+                            <th class="p-3.5 font-medium">Totale</th>
+                            <th class="p-3.5 font-medium text-right">Fascicolo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabella-finanze" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="analisi" class="tab-content space-y-4">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h2 class="text-sm font-bold mb-4">📈 Andamento Finanziario</h2>
-                <canvas id="graficoFinanze"></canvas>
+        <div id="analisi" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200/60">
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-6">📊 Report Finanziario Visivo</h2>
+                <div class="flex justify-center">
+                    <div class="w-full max-w-md">
+                        <canvas id="graficoFinanze"></canvas>
+                    </div>
+                </div>
+                <p class="text-[10px] text-center text-slate-400 mt-4 uppercase tracking-wider">I dati si aggiornano automaticamente in base ai filtri selezionati</p>
             </div>
         </div>
-        
-        </main>
+
+        <div id="prenotazioni" class="tab-content space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60 space-y-4">
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">📅 Registra Nuova Richiesta Alloggio</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unità</label><select id="pr-unita" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none"><option value="PT_A">PT - Interno A</option><option value="PT_B">PT - Interno B</option></select></div>
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Inquilino</label><input type="text" id="pr-nome" placeholder="Nome Referente" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs outline-none"></div>
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Check-in</label><input type="date" id="pr-in" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs outline-none"></div>
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Check-out</label><input type="date" id="pr-out" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs outline-none"></div>
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Stato</label><select id="pr-stato" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none"><option value="In Trattativa">In Trattativa</option><option value="Confermata">Confermata</option></select></div>
+                </div>
+                <button onclick="aggiungiPrenotazione()" class="bg-slate-900 text-white font-semibold py-2 px-5 rounded-lg text-xs hover:bg-amber-600 transition shadow-xs cursor-pointer">Salva a Calendario</button>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200/60 overflow-hidden">
+                <table class="w-full text-left text-xs text-slate-600 dynamic-table">
+                    <thead class="bg-slate-900 text-white text-[10px] uppercase tracking-wider">
+                        <tr>
+                            <th class="p-3.5 font-medium">Unità</th>
+                            <th class="p-3.5 font-medium">Inquilino</th>
+                            <th class="p-3.5 font-medium">Periodo Soggiorno</th>
+                            <th class="p-3.5 font-medium">Stato</th>
+                            <th class="p-3.5 font-medium text-right">Dettagli</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabella-prenotazioni" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="documenti" class="tab-content space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60 space-y-4">
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">📁 Archivio Documenti Generici</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unità</label><select id="doc-unita" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none"><option value="PT_A">PT - Interno A</option><option value="PT_B">PT - Interno B</option><option value="P1">Primo Piano</option><option value="COMUNE">Spazi Comuni</option></select></div>
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Categoria</label><select id="doc-cat" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none"><option value="Contratto Affitto">Contratto Affitto</option><option value="Planimetria">Planimetria / Tecnici</option><option value="Assicurazione">Assicurazione</option></select></div>
+                    <div class="md:col-span-2"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">File</label><div class="flex gap-2"><input type="file" id="doc-file" class="w-full text-xs text-slate-500"><button onclick="caricaDocumento()" class="bg-slate-900 text-white font-semibold px-4 py-2 rounded-lg text-xs hover:bg-amber-600 transition cursor-pointer">Salva</button></div></div>
+                </div>
+
+                <table class="w-full text-left text-xs text-slate-600 dynamic-table">
+                    <thead class="bg-slate-900 text-white text-[10px] uppercase tracking-wider">
+                        <tr>
+                            <th class="p-3.5 font-medium">Unità</th>
+                            <th class="p-3.5 font-medium">Documento</th>
+                            <th class="p-3.5 font-medium">Categoria</th>
+                            <th class="p-3.5 font-medium text-right">Azione</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabella-documenti" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="note" class="tab-content space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60 space-y-3">
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">📝 Registro Note Libere</h2>
+                <textarea id="note-testo" rows="12" oninput="filtraContenutoTab()" class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none text-xs font-mono bg-slate-50/50 leading-relaxed" placeholder="Scrivi annotazioni operative..."></textarea>
+                <button onclick="salvaNote()" class="bg-slate-900 text-white font-semibold py-2.5 px-6 rounded-lg text-xs hover:bg-amber-600 transition shadow-xs cursor-pointer">Salva Note</button>
+            </div>
+        </div>
+
+        <div class="flex justify-end p-4 bg-slate-100 rounded-xl border border-slate-200">
+            <button onclick="esportaTutto()" class="bg-slate-700 text-white text-[10px] uppercase tracking-wider font-bold px-4 py-2 rounded-lg hover:bg-amber-600 transition cursor-pointer">Esporta Copia Backup (JSON)</button>
+        </div>
+    </main>
+
+    <div id="modal-gestione" class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl border border-slate-200 my-8 overflow-hidden transform transition-all">
+            <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
+                <h3 id="modal-titolo" class="text-xs font-bold uppercase tracking-wider text-amber-400">Fascicolo Voce</h3>
+                <button onclick="chiudiModal()" class="text-slate-400 hover:text-white font-semibold text-lg cursor-pointer">&times;</button>
+            </div>
+            <div id="modal-corpo" class="p-5 space-y-4 text-xs text-slate-600">
+                </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-between items-center gap-2">
+                <div id="modal-area-azione"></div>
+                <button onclick="chiudiModal()" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 text-xs cursor-pointer">Chiudi Fascicolo</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        let db, chart;
+        let db, chartFinanze;
+        const nomiUnita = { "PT_A": "🏠 PT - Interno A", "PT_B": "🏠 PT - Interno B", "P1": "🏗️ Primo Piano", "COMUNE": "🌳 Spazi Comuni (Giardino)" };
+
         const request = indexedDB.open("OrigineDB_V8", 1);
         request.onupgradeneeded = (e) => {
             db = e.target.result;
             db.createObjectStore("finanze", { keyPath: "id", autoIncrement: true });
+            db.createObjectStore("prenotazioni", { keyPath: "id", autoIncrement: true });
+            db.createObjectStore("documenti", { keyPath: "id", autoIncrement: true });
         };
-        request.onsuccess = (e) => { db = e.target.result; aggiornaTutto(); };
+        request.onsuccess = (e) => { db = e.target.result; aggiornaTutto(); caricaNote(); };
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => { 
+                btn.classList.remove('border-amber-500', 'text-amber-500'); 
+                btn.classList.add('border-transparent', 'text-slate-400'); 
+            });
             document.getElementById(tabId).classList.add('active');
+            event.target.classList.remove('border-transparent', 'text-slate-400');
+            event.target.classList.add('border-amber-500', 'text-amber-500');
+            filtraContenutoTab();
+            
+            // Seleziona la tab analisi, genera il grafico
             if(tabId === 'analisi') generaGrafico();
         }
 
-        function aggiornaTutto() { mostraFinanze(); }
+        function aggiornaTutto() { 
+            mostraFinanze(); 
+            mostraPrenotazioni(); 
+            mostraDocumenti(); 
+            if(document.getElementById('analisi').classList.contains('active')) generaGrafico();
+        }
+
+        function renderizzaTag(testo) {
+            if (!testo) return '';
+            return testo.replace(/(#[a-zA-Z0-9àèìòù]+)/g, '<span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px] mx-0.5">$1</span>');
+        }
+
+        function filtraContenutoTab() {
+            const query = document.getElementById('ricerca-globale').value.toLowerCase().trim();
+            const activeTab = document.querySelector('.tab-content.active');
+            
+            if (activeTab.id === 'note') {
+                const areaNote = document.getElementById('note-testo');
+                if (query !== '' && !areaNote.value.toLowerCase().includes(query)) areaNote.classList.add('ring-2', 'ring-rose-400');
+                else areaNote.classList.remove('ring-2', 'ring-rose-400');
+                return;
+            }
+
+            activeTab.querySelectorAll('.dynamic-table tbody tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none";
+            });
+        }
+
+        function apriModal(titolo, contenutoHtml, azioneHtml) {
+            document.getElementById('modal-titolo').innerText = titolo;
+            document.getElementById('modal-corpo').innerHTML = contenutoHtml;
+            document.getElementById('modal-area-azione').innerHTML = azioneHtml;
+            document.getElementById('modal-gestione').classList.remove('hidden');
+        }
+        function chiudiModal() { document.getElementById('modal-gestione').classList.add('hidden'); }
+
+        // ================= STRUTTURA LOGICA: FINANZE =================
+        function aggiungiTransazione() {
+            const unita = document.getElementById('fin-unita').value;
+            const desc = document.getElementById('fin-desc').value;
+            const tipo = document.getElementById('fin-tipo').value;
+            const importo = parseFloat(document.getElementById('fin-importo').value);
+            if (!desc || isNaN(importo)) return alert("Compila i campi richiesti.");
+            
+            const tx_meta = (importo / 2);
+            const tx = db.transaction("finanze", "readwrite");
+            tx.objectStore("finanze").add({ 
+                unita, desc, tipo, importo, data: new Date().toLocaleDateString('it-IT'),
+                metodoCosimo: "Da Saldare", metodoMaria: "Da Saldare",
+                importoCosimo: tx_meta, importoMaria: tx_meta,
+                fileBolletta: null, nomeBolletta: "",
+                fileRicevutaCosimo: null, nomeRicevutaCosimo: "",
+                fileRicevutaMaria: null, nomeRicevutaMaria: ""
+            });
+            tx.oncomplete = () => { 
+                document.getElementById('fin-desc').value = ''; 
+                document.getElementById('fin-importo').value = ''; 
+                mostraFinanze(); 
+            };
+        }
 
         function mostraFinanze() {
-            const tbody = document.getElementById('tabella-finanze');
-            tbody.innerHTML = '';
+            const filtro = document.getElementById('filtro-unita-generale').value;
+            const tbody = document.getElementById('tabella-finanze'); tbody.innerHTML = '';
             let totE = 0, totU = 0;
+
             db.transaction("finanze", "readonly").objectStore("finanze").openCursor().onsuccess = (e) => {
                 const cursor = e.target.result;
-                if(cursor) {
+                if (cursor) {
                     const f = cursor.value;
-                    if(f.tipo === 'entrata') totE += f.importo; else totU += f.importo;
-                    tbody.innerHTML += `<tr><td class="p-2">${f.desc}</td><td class="p-2 font-bold">${f.importo}€</td></tr>`;
+                    if (filtro === "TUTTE" || f.unita === filtro) {
+                        if (f.tipo === 'entrata') totE += f.importo; else totU += f.importo;
+                        tbody.innerHTML += `
+                            <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                                <td class="p-3 font-semibold text-slate-700">${nomiUnita[f.unita]}</td>
+                                <td class="p-3 text-slate-900 font-medium">${renderizzaTag(f.desc)}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded-md ${f.tipo === 'entrata' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${f.tipo.toUpperCase()}</span></td>
+                                <td class="p-3 font-bold ${f.tipo === 'entrata' ? 'text-emerald-600' : 'text-rose-600'}">€ ${f.importo.toFixed(2)}</td>
+                                <td class="p-3 text-right"><button onclick="gestisciFinanza(${f.id})" class="bg-white border border-slate-200 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-500 hover:text-white hover:border-amber-500 transition cursor-pointer">Gestisci</button></td>
+                            </tr>`;
+                    }
                     cursor.continue();
                 } else {
                     document.getElementById('txt-entrate').innerText = `€ ${totE.toFixed(2)}`;
                     document.getElementById('txt-uscite').innerText = `€ ${totU.toFixed(2)}`;
+                    document.getElementById('txt-bilancio').innerText = `€ ${(totE - totU).toFixed(2)}`;
+                    filtraContenutoTab();
                 }
             };
         }
 
+        function gestisciFinanza(id) {
+            db.transaction("finanze", "readonly").objectStore("finanze").get(id).onsuccess = (e) => {
+                const f = e.target.result;
+                const metaSuggerita = (f.importo / 2).toFixed(2);
+                
+                const valCosimo = f.importoCosimo !== undefined ? f.importoCosimo : metaSuggerita;
+                const valMaria = f.importoMaria !== undefined ? f.importoMaria : metaSuggerita;
+
+                const allegatoBollettaHtml = f.fileBolletta ? 
+                    `<div class="flex justify-between items-center bg-slate-100 p-2 rounded-lg mt-1"><span class="text-xs truncate font-medium text-slate-700">📄 ${f.nomeBolletta}</span><a href="${f.fileBolletta}" download="${f.nomeBolletta}" class="text-indigo-600 font-bold hover:underline">Scarica</a></div>` : 
+                    `<input type="file" onchange="salvaFileFinanza(${f.id}, this, 'fileBolletta', 'nomeBolletta')" class="w-full text-xs mt-1 text-slate-500">`;
+
+                const allegatoCosimoHtml = f.fileRicevutaCosimo ? 
+                    `<div class="flex justify-between items-center bg-slate-100 p-1.5 rounded mt-1"><span class="text-[10px] truncate font-medium text-slate-600">✔ Ricevuta</span><a href="${f.fileRicevutaCosimo}" download="${f.nomeRicevutaCosimo}" class="text-indigo-600 font-bold hover:underline">Scarica</a></div>` : 
+                    `<input type="file" onchange="salvaFileFinanza(${f.id}, this, 'fileRicevutaCosimo', 'nomeRicevutaCosimo')" class="w-full text-[10px] mt-1 text-slate-400">`;
+
+                const allegatoMariaHtml = f.fileRicevutaMaria ? 
+                    `<div class="flex justify-between items-center bg-slate-100 p-1.5 rounded mt-1"><span class="text-[10px] truncate font-medium text-slate-600">✔ Ricevuta</span><a href="${f.fileRicevutaMaria}" download="${f.nomeRicevutaMaria}" class="text-indigo-600 font-bold hover:underline">Scarica</a></div>` : 
+                    `<input type="file" onchange="salvaFileFinanza(${f.id}, this, 'fileRicevutaMaria', 'nomeRicevutaMaria')" class="w-full text-[10px] mt-1 text-slate-400">`;
+
+                const html = `
+                    <div class="space-y-4">
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unità ed Intestazione</p><p class="font-semibold text-slate-800 text-sm">${nomiUnita[f.unita]}</p></div>
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Spesa Complessiva</p><p class="text-base font-bold text-slate-900">${f.tipo === 'entrata' ? '+' : '-'} € ${f.importo.toFixed(2)} <span class="text-xs font-normal text-slate-400">inserito il ${f.data}</span></p></div>
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dettaglio Causale</p><p class="text-slate-700 font-medium">${renderizzaTag(f.desc)}</p></div>
+                        
+                        <div class="p-3 bg-amber-50/40 border border-amber-200/50 rounded-xl">
+                            <label class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider">Allegato Documento / Bolletta</label>
+                            ${allegatoBollettaHtml}
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
+                                <p class="text-[11px] font-bold text-slate-800 border-b pb-1">🙋‍♂️ Quota Cosimo</p>
+                                <div>
+                                    <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Importo Versato (€)</label>
+                                    <input type="number" id="imp-cosimo" value="${valCosimo}" step="0.01" oninput="ricalcolaQuota(${f.id}, 'cosimo', ${f.importo})" class="w-full p-1.5 border rounded bg-white text-xs font-bold outline-none focus:border-amber-500">
+                                    <span class="text-[9px] text-slate-400 block mt-0.5 font-medium italic">💡 Ideale 50%: € ${metaSuggerita}</span>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] uppercase font-bold text-slate-400">Modalità Saldo</label>
+                                    <select onchange="aggiornaMetodoSaldatura(${f.id}, 'metodoCosimo', this.value)" class="w-full p-1 border rounded bg-white text-[11px] outline-none">
+                                        <option value="Da Saldare" ${f.metodoCosimo === 'Da Saldare' ? 'selected' : ''}>❌ Da Saldare</option>
+                                        <option value="Conto Cointestato" ${f.metodoCosimo === 'Conto Cointestato' ? 'selected' : ''}>💳 Conto Cointestato</option>
+                                        <option value="Bonifico Bancario" ${f.metodoCosimo === 'Bonifico Bancario' ? 'selected' : ''}>🏦 Bonifico</option>
+                                        <option value="Carta Personale" ${f.metodoCosimo === 'Carta Personale' ? 'selected' : ''}>🙋‍♂️ Carta Personale</option>
+                                        <option value="Contanti" ${f.metodoCosimo === 'Contanti' ? 'selected' : ''}>💵 Contanti</option>
+                                    </select>
+                                </div>
+                                <div><label class="text-[9px] uppercase font-bold text-slate-400 block">Ricevuta</label>${allegatoCosimoHtml}</div>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
+                                <p class="text-[11px] font-bold text-slate-800 border-b pb-1">🙋‍♀️ Quota M.Teresa</p>
+                                <div>
+                                    <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Importo Versato (€)</label>
+                                    <input type="number" id="imp-maria" value="${valMaria}" step="0.01" oninput="ricalcolaQuota(${f.id}, 'maria', ${f.importo})" class="w-full p-1.5 border rounded bg-white text-xs font-bold outline-none focus:border-amber-500">
+                                    <span class="text-[9px] text-slate-400 block mt-0.5 font-medium italic">💡 Ideale 50%: € ${metaSuggerita}</span>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] uppercase font-bold text-slate-400">Modalità Saldo</label>
+                                    <select onchange="aggiornaMetodoSaldatura(${f.id}, 'metodoMaria', this.value)" class="w-full p-1 border rounded bg-white text-[11px] outline-none">
+                                        <option value="Da Saldare" ${f.metodoMaria === 'Da Saldare' ? 'selected' : ''}>❌ Da Saldare</option>
+                                        <option value="Conto Cointestato" ${f.metodoMaria === 'Conto Cointestato' ? 'selected' : ''}>💳 Conto Cointestato</option>
+                                        <option value="Bonifico Bancario" ${f.metodoMaria === 'Bonifico Bancario' ? 'selected' : ''}>🏦 Bonifico</option>
+                                        <option value="Carta Personale" ${f.metodoMaria === 'Carta Personale' ? 'selected' : ''}>🙋‍♀️ Carta Personale</option>
+                                        <option value="Contanti" ${f.metodoMaria === 'Contanti' ? 'selected' : ''}>💵 Contanti</option>
+                                    </select>
+                                </div>
+                                <div><label class="text-[9px] uppercase font-bold text-slate-400 block">Ricevuta</label>${allegatoMariaHtml}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                const azione = `<button onclick="eliminaElemento('finanze', ${f.id}, mostraFinanze)" class="bg-rose-600 text-white text-[10px] uppercase font-bold tracking-wider px-3 py-2 rounded-lg hover:bg-rose-700 transition cursor-pointer">Elimina</button>`;
+                apriModal("Gestione Flussi Separati", html, azione);
+            };
+        }
+
+        function ricalcolaQuota(id, chiModifica, importoTotale) {
+            const inputCosimo = document.getElementById('imp-cosimo');
+            const inputMaria = document.getElementById('imp-maria');
+            
+            let valCosimo = parseFloat(inputCosimo.value) || 0;
+            let valMaria = parseFloat(inputMaria.value) || 0;
+
+            if (chiModifica === 'cosimo') {
+                valMaria = Math.max(0, importoTotale - valCosimo);
+                inputMaria.value = valMaria.toFixed(2);
+            } else if (chiModifica === 'maria') {
+                valCosimo = Math.max(0, importoTotale - valMaria);
+                inputCosimo.value = valCosimo.toFixed(2);
+            }
+
+            const tx = db.transaction("finanze", "readwrite");
+            const store = tx.objectStore("finanze");
+            store.get(id).onsuccess = (e) => {
+                const d = e.target.result;
+                d.importoCosimo = valCosimo;
+                d.importoMaria = valMaria;
+                store.put(d);
+            };
+        }
+
+        function aggiornaMetodoSaldatura(id, campoProprieta, valore) {
+            const tx = db.transaction("finanze", "readwrite");
+            const store = tx.objectStore("finanze");
+            store.get(id).onsuccess = (e) => {
+                const d = e.target.result; d[campoProprieta] = valore; store.put(d);
+            };
+        }
+
+        function salvaFileFinanza(id, inputElement, campoFile, campoNome) {
+            if (inputElement.files.length === 0) return;
+            const file = inputElement.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const tx = db.transaction("finanze", "readwrite");
+                const store = tx.objectStore("finanze");
+                store.get(id).onsuccess = (ev) => {
+                    const d = ev.target.result;
+                    d[campoFile] = e.target.result;
+                    d[campoNome] = file.name;
+                    store.put(d);
+                };
+                tx.oncomplete = () => { gestisciFinanza(id); };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ================= STRUTTURA LOGICA: GRAFICI ANALISI =================
         function generaGrafico() {
             const ctx = document.getElementById('graficoFinanze').getContext('2d');
-            if(chart) chart.destroy();
+            if(chartFinanze) chartFinanze.destroy();
             
-            // Semplice esempio: Prendi dati dal DB e passa al grafico
-            chart = new Chart(ctx, {
+            const txtEntrate = document.getElementById('txt-entrate').innerText;
+            const txtUscite = document.getElementById('txt-uscite').innerText;
+            
+            const entrate = parseFloat(txtEntrate.replace('€ ', '').replace(',', '.')) || 0;
+            const uscite = parseFloat(txtUscite.replace('€ ', '').replace(',', '.')) || 0;
+
+            chartFinanze = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Entrate', 'Uscite'],
+                    labels: ['Entrate (€)', 'Uscite (€)'],
                     datasets: [{
-                        data: [parseFloat(document.getElementById('txt-entrate').innerText.replace('€ ','')), 
-                               parseFloat(document.getElementById('txt-uscite').innerText.replace('€ ',''))],
-                        backgroundColor: ['#059669', '#e11d48']
+                        data: [entrate, uscite],
+                        backgroundColor: ['#059669', '#e11d48'],
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 12 } } },
+                        tooltip: { callbacks: { label: function(context) { return ' € ' + context.parsed; } } }
+                    }
                 }
             });
         }
-    </script>
-</body>
-</html>
+
+        // ================= STRUTTURA LOGICA: PRENOTAZIONI =================
+        function aggiungiPrenotazione() {
+            const unita = document.getElementById('pr-unita').value; const nome = document.getElementById('pr-nome').value;
+            const checkin = document.getElementById('pr-in').value; const checkout = document.getElementById('pr-out').value;
+            const stato = document.getElementById('pr-stato').value;
+            if (!nome || !checkin || !checkout) return alert("Riempi i campi obbligatori.");
+            
+            const tx = db.transaction("prenotazioni", "readwrite");
+            tx.objectStore("prenotazioni").add({ 
+                unita, nome, checkin, checkout, stato,
+                metodoPagamentoInquilino: "Diretto / Contanti", prezzoTotale: 0, noteServizi: ""
+            });
+            tx.oncomplete = () => { document.getElementById('pr-nome').value = ''; mostraPrenotazioni(); };
+        }
+
+        function mostraPrenotazioni() {
+            const filtro = document.getElementById('filtro-unita-generale').value;
+            const tbody = document.getElementById('tabella-prenotazioni'); tbody.innerHTML = '';
+            db.transaction("prenotazioni", "readonly").objectStore("prenotazioni").openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const p = cursor.value;
+                    if (filtro === "TUTTE" || p.unita === filtro) {
+                        tbody.innerHTML += `
+                            <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                                <td class="p-3 font-semibold text-slate-700">${nomiUnita[p.unita]}</td>
+                                <td class="p-3 font-bold text-slate-900">${renderizzaTag(p.nome)}</td>
+                                <td class="p-3 font-medium">${new Date(p.checkin).toLocaleDateString('it-IT')} ➡️ ${new Date(p.checkout).toLocaleDateString('it-IT')}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded-md ${p.stato === 'Confermata' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">${p.stato}</span></td>
+                                <td class="p-3 text-right"><button onclick="gestisciPrenotazione(${p.id})" class="bg-white border border-slate-200 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-500 hover:text-white hover:border-amber-500 transition cursor-pointer">Gestisci</button></td>
+                            </tr>`;
+                    }
+                    cursor.continue();
+                } else { filtraContenutoTab(); }
+            };
+        }
+
+        function gestisciPrenotazione(id) {
+            db.transaction("prenotazioni", "readonly").objectStore("prenotazioni").get(id).onsuccess = (e) => {
+                const p = e.target.result;
+                const giorni = Math.ceil((new Date(p.checkout) - new Date(p.checkin)) / (1000 * 60 * 60 * 24));
+                
+                const html = `
+                    <div class="space-y-4">
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unità Assegnata</p><p class="font-semibold text-slate-800 text-sm">${nomiUnita[p.unita]}</p></div>
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Inquilino</p><p class="text-slate-900 font-bold text-base">${renderizzaTag(p.nome)}</p></div>
+                        
+                        <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <div><p class="text-[9px] font-semibold text-slate-500 uppercase">Arrivo</p><p class="font-bold text-slate-800 text-xs">${new Date(p.checkin).toLocaleDateString('it-IT')}</p></div>
+                            <div><p class="text-[9px] font-semibold text-slate-500 uppercase">Partenza</p><p class="font-bold text-slate-800 text-xs">${new Date(p.checkout).toLocaleDateString('it-IT')}</p></div>
+                            <div><p class="text-[9px] font-semibold text-amber-700 uppercase">Notti Totali</p><p class="font-bold text-amber-600 text-sm">${giorni}</p></div>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 border border-slate-200/60 rounded-xl space-y-3">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Metodo Pagamento</label>
+                                    <select onchange="aggiornaCampoPrenotazione(${p.id}, 'metodoPagamentoInquilino', this.value)" class="w-full p-2 border border-slate-200 bg-white rounded text-xs outline-none">
+                                        <option value="Diretto / Contanti" ${p.metodoPagamentoInquilino === 'Diretto / Contanti' ? 'selected' : ''}>Diretto / Contanti</option>
+                                        <option value="Bonifico Bancario" ${p.metodoPagamentoInquilino === 'Bonifico Bancario' ? 'selected' : ''}>Bonifico Bancario</option>
+                                        <option value="Airbnb" ${p.metodoPagamentoInquilino === 'Airbnb' ? 'selected' : ''}>Airbnb Platform</option>
+                                        <option value="Booking.com" ${p.metodoPagamentoInquilino === 'Booking.com' ? 'selected' : ''}>Booking.com</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Prezzo Totale (€)</label>
+                                    <input type="number" value="${p.prezzoTotale || 0}" onchange="aggiornaCampoPrenotazione(${p.id}, 'prezzoTotale', parseFloat(this.value))" class="w-full p-1.5 border border-slate-200 bg-white rounded text-xs outline-none font-bold">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Stato</label>
+                                <select onchange="aggiornaCampoPrenotazione(${p.id}, 'stato', this.value)" class="p-1.5 border border-slate-200 bg-white rounded text-xs outline-none font-medium">
+                                    <option value="In Trattativa" ${p.stato === 'In Trattativa' ? 'selected' : ''}>In Trattativa</option>
+                                    <option value="Confermata" ${p.stato === 'Confermata' ? 'selected' : ''}>Confermata</option>
+                                    <option value="Terminata" ${p.stato === 'Terminata' ? 'selected' : ''}>Terminata</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Note Servizi / Extra</label>
+                                <textarea onchange="aggiornaCampoPrenotazione(${p.id}, 'noteServizi', this.value)" class="w-full p-2 border border-slate-200 bg-white rounded text-xs outline-none h-16 font-medium">${p.noteServizi || ""}</textarea>
+                            </div>
+                        </div>
+                    </div>`;
+                const action = `<button onclick="eliminaElemento('prenotazioni', ${p.id}, mostraPrenotazioni)" class="bg-rose-600 text-white text-[10px] uppercase font-bold tracking-wider px-3 py-2 rounded-lg hover:bg-rose-700 transition cursor-pointer">Rimuovi</button>`;
+                apriModal("Fascicolo Alloggio", html, action);
+            };
+        }
+
+        function aggiornaCampoPrenotazione(id, campo, valore) {
+            const tx = db.transaction("prenotazioni", "readwrite");
+            const store = tx.objectStore("prenotazioni");
+            store.get(id).onsuccess = (e) => {
+                const d = e.target.result; d[campo] = valore; store.put(d);
+            };
+            tx.oncomplete = () => { mostraPrenotazioni(); };
+        }
+
+        // ================= STRUTTURA LOGICA: DOCUMENTI GLOBLALI =================
+        function caricaDocumento() {
+            const unita = document.getElementById('doc-unita').value; const cat = document.getElementById('doc-cat').value;
+            const fileInput = document.getElementById('doc-file'); if (fileInput.files.length === 0) return alert("Seleziona file.");
+            const file = fileInput.files[0]; const reader = new FileReader();
+            reader.onload = (e) => {
+                db.transaction("documenti", "readwrite").objectStore("documenti").add({ unita, nome: file.name, categoria: cat, data: new Date().toLocaleDateString('it-IT'), fileData: e.target.result });
+                fileInput.value = ''; mostraDocumenti();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function mostraDocumenti() {
+            const filtro = document.getElementById('filtro-unita-generale').value;
+            const tbody = document.getElementById('tabella-documenti'); tbody.innerHTML = '';
+            db.transaction("documenti", "readonly").objectStore("documenti").openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const d = cursor.value;
+                    if (filtro === "TUTTE" || d.unita === filtro) {
+                        tbody.innerHTML += `
+                            <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                                <td class="p-3 font-semibold text-slate-700">${nomiUnita[d.unita]}</td>
+                                <td class="p-3 font-medium text-slate-900">${renderizzaTag(d.nome)}</td>
+                                <td class="p-3"><span class="bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200/60 px-2 py-0.5 rounded">${d.categoria}</span></td>
+                                <td class="p-3 text-right"><button onclick="gestisciDocumento(${d.id})" class="bg-white border border-slate-200 px-3 py-
